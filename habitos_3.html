@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Me amo, lo lograrás — VerdeRaíz</title>
+<meta name="theme-color" content="#072" />
+<style>
+:root{
+  --bg1:#02140f; --bg2:#083b2b; --panel:rgba(255,255,255,0.04);
+  --glass:rgba(255,255,255,0.06); --accent:#9be6b8; --muted:#b7d9c5; --text:#eafaf0
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Helvetica Neue', Arial;color:var(--text)}
+body{background:linear-gradient(135deg,var(--bg1),var(--bg2));overflow-y:auto}
+/* animated background (subtle particles via css) */
+.bg-anim{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-anim:before{content:'';position:absolute;inset:-20%;background:radial-gradient(circle at 10% 20%, rgba(155,230,184,0.06), transparent 10%), radial-gradient(circle at 80% 80%, rgba(0,180,116,0.06), transparent 12%);filter:blur(40px);animation:float 12s linear infinite}
+@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-20px)}100%{transform:translateY(0)}}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:18px auto;padding:20px}
+.header{display:flex;align-items:center;gap:14px}
+.logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#0b6b3a,#0fa06a);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+.logo svg{width:42px;height:42px}
+.hgroup{flex:1}
+h1{margin:0;font-size:1.6rem;color:var(--accent)}
+.lead{margin:4px 0 0;color:var(--muted)}
+.controls{display:flex;gap:8px;align-items:center}
+.btn{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;cursor:pointer}
+.btn.primary{background:var(--accent);color:#013022;border:none}
+.grid{display:grid;grid-template-columns:1fr 380px;gap:16px;margin-top:16px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+details{background:var(--glass);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+summary{font-weight:700;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.task-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.task{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.02);cursor:pointer;transition:transform .22s ease,opacity .35s ease}
+.task:hover{transform:translateY(-3px)}
+.task .title{flex:1}
+.task.anim{transform:scale(1.08);opacity:0}
+.completed-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.completed-item{display:flex;justify-content:space-between;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border-left:4px solid var(--accent);color:var(--muted);cursor:pointer}
+.small{font-size:0.86rem;color:var(--muted)}
+#phrase{margin-top:12px;padding:10px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));font-style:italic}
+.settings{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.switch{display:inline-flex;align-items:center;gap:8px}
+input[type='text']{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
+.footer{margin-top:14px;text-align:center;color:rgba(255,255,255,0.4);font-size:0.9rem}
+.badge{background:rgba(0,0,0,0.18);padding:6px 8px;border-radius:999px;color:var(--accent);font-weight:700}
+.counter{display:flex;gap:8px;align-items:center}
+.editRow{display:flex;gap:8px;margin-top:8px}
+.iconBtn{background:transparent;border:0;color:var(--accent);cursor:pointer;font-weight:700}
+</style>
+</head>
+<body>
+<div class="bg-anim" aria-hidden></div>
+<div class="wrap">
+  <div class="header">
+    <div class="logo" aria-hidden>
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="48" fill="#ffffff12"/><path d="M22 50c0-24 26-36 28-36s30 10 30 36c0 26-56 36-58 36s0-16 0-36z" fill="#fff" opacity="0.9"/></svg>
+    </div>
+    <div class="hgroup">
+      <h1>Me amo, lo lograrás</h1>
+      <div class="lead">Rutina diaria — selecciona y completa tareas. PWA + guardado, sonidos y vibración.</div>
+    </div>
+    <div class="controls">
+      <div class="counter badge" id="streak">Racha: 0</div>
+      <button class="btn" id="openSettings">⚙️</button>
+      <button class="btn primary" id="exportBtn">Enviar hoy (WhatsApp)</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section>
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div><strong>✅ TAREAS SELECCIONABLES</strong><div class="small">Categorías desplegables — toca para completar</div></div>
+          <div>
+            <button class="btn" id="resetBtn">Reiniciar</button>
+            <button class="btn" id="clearBtn">Limpiar</button>
+          </div>
+        </div>
+        <div id="categories">
+        <!-- categories injected -->
+        </div>
+        <div style="margin-top:12px">
+          <strong>Editar tareas</strong>
+          <div class="editRow">
+            <select id="editCategory"></select>
+            <input type="text" id="newTaskText" placeholder="Nueva tarea...">
+            <button class="btn" id="addTaskBtn">Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <strong>Consejos</strong>
+        <p class="small">Cada vez que completas una tarea se reproduce un sonido suave, vibra el teléfono y aparece una frase estoica. Puedes enviar todas las tareas completadas hoy por WhatsApp con el botón "Enviar hoy".</p>
+      </div>
+    </section>
+
+    <aside>
+      <div class="panel">
+        <h3>Completadas</h3>
+        <div id="completed" class="completed-list" aria-live="polite"></div>
+        <div id="phrase">Frase motivadora aparecerá aquí.</div>
+
+        <div style="margin-top:12px" class="small">Opciones rápidas</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" id="undoAll">Deshacer todo</button>
+          <button class="btn" id="downloadCSV">Exportar CSV</button>
+        </div>
+
+        <div class="panel" style="margin-top:12px;background:transparent;border:0;padding:0">
+          <strong>Configuración</strong>
+          <div class="settings">
+            <label class="switch"><input type="checkbox" id="vibrateChk"> Vibración al completar</label>
+            <label class="switch"><input type="checkbox" id="soundChk" checked> Sonido al completar</label>
+            <label class="switch"><input type="checkbox" id="saveChk" checked> Guardar progreso (local)</label>
+            <label class="switch">Número WhatsApp: <input type="text" id="whatsappNumber" placeholder="+525649533789"></label>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">Si quieres convertir a APK puedo guiarte en los pasos para compilar (te doy los archivos listos).</div>
+</div>
+
+<script>
+/* ===== data & initial tasks (same structure) ===== */
+const DEFAULT_CATEGORIES = [
+  {id:'limpieza', title:'🧽 Limpieza personal', tasks:[{id:'banarte',name:'Bañarte y arreglarte'},{id:'dientes',name:'Lavado de dientes'},{id:'perfume',name:'Perfume / Crema'},{id:'ropa',name:'Ropa limpia y presentable'}]},
+  {id:'salud', title:'💪 Salud / Cuerpo', tasks:[{id:'desayuno',name:'Desayuno antes de salir'},{id:'almuerzo',name:'Almuerzo balanceado'},{id:'cena',name:'Cena ligera'},{id:'estiramientos',name:'10–15 min de estiramientos'},{id:'caminar',name:'10–15 min de caminata o ejercicio'}]},
+  {id:'mental', title:'🧠 Desarrollo mental / personal', tasks:[{id:'leer',name:'Leer 10–15 minutos'},{id:'escribir',name:'Escribir algo personal'},{id:'dibujar',name:'Dibujar'},{id:'estudiar',name:'Estudiar 20–30 minutos'},{id:'sexo',name:'Actividad sexual / masturbación consciente'}]},
+  {id:'trabajo', title:'💼 Trabajo', tasks:[{id:'herramientas',name:'Llevar herramientas'},{id:'organizar',name:'Organizar tareas del día'},{id:'mensaje',name:'Mandar mensaje de llegada'},{id:'cobros',name:'Registrar cobro y gastos del día'}]},
+  {id:'comidas', title:'🍽️ Comidas programadas', tasks:[{id:'primera',name:'Primera comida'},{id:'segunda',name:'Segunda comida'},{id:'tercera',name:'Tercera comida'},{id:'snack',name:'Snack saludable'}]},
+  {id:'casa', title:'🏠 Casa / Orden', tasks:[{id:'ordenar',name:'Organizar tu cuarto'},{id:'lavar',name:'Lavar trastes'},{id:'limpiar',name:'Limpiar área común'},{id:'preparar',name:'Preparar ropa del siguiente día'}]}
+];
+
+const STOIC_PHRASES = [
+  "Lo que depende de mí, lo domino. Lo que no, lo suelto.",
+  "Mi mente es más fuerte que cualquier circunstancia.",
+  "Sufro más en mi imaginación que en la realidad.",
+  "La disciplina es mi verdadero poder.",
+  "Cada día me entreno para ser inquebrantable.",
+  "La tranquilidad viene de controlar mis pensamientos, no el mundo.",
+  "Donde otros se quejan, yo actúo.",
+  "Elijo la virtud por encima del miedo.",
+  "Nada externo puede dominarme si yo no le doy permiso.",
+  "Soy dueño de mis emociones, no su esclavo."
+];
+
+/* ===== persistence keys ===== */
+const KEY_STATE = 'meamo_state_v2';
+
+/* ===== helper: load/save state ===== */
+function defaultState(){
+  // build tasks map
+  const cats = DEFAULT_CATEGORIES.map(c=>({id:c.id,title:c.title,tasks:c.tasks.map(t=>({id:t.id,name:t.name}))}));
+  return { categories:cats, completed:[], streak:0, lastDate:null, settings:{vibrate:true,sound:true,save:true,whatsapp:'+525649533789'} };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(KEY_STATE);
+    if (!raw) return defaultState();
+    const s = JSON.parse(raw);
+    // ensure structure
+    if (!s.categories) s.categories = defaultState().categories;
+    if (!s.settings) s.settings = defaultState().settings;
+    return s;
+  }catch(e){return defaultState()}
+}
+function saveState(){ if (state.settings.save) localStorage.setItem(KEY_STATE, JSON.stringify(state)); }
+
+let state = loadState();
+
+/* ===== UI refs ===== */
+const categoriesEl = document.getElementById('categories');
+const completedEl = document.getElementById('completed');
+const phraseEl = document.getElementById('phrase');
+const streakEl = document.getElementById('streak');
+const whatsappInput = document.getElementById('whatsappNumber');
+
+// settings
+document.getElementById('vibrateChk').checked = state.settings.vibrate;
+document.getElementById('soundChk').checked = state.settings.sound;
+document.getElementById('saveChk').checked = state.settings.save;
+whatsappInput.value = state.settings.whatsapp;
+
+/* ===== audio setup (WebAudio tone) ===== */
+let audioCtx=null;
+function playTone(){
+  if (!state.settings.sound) return;
+  try{
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type='sine'; o.frequency.value=880; g.gain.value=0.03;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.35);
+    setTimeout(()=>{ o.stop(); },380);
+  }catch(e){}
+}
+
+/* ===== vibration helper ===== */
+function vibrate(){ if (state.settings.vibrate && navigator.vibrate) navigator.vibrate(60); }
+
+/* ===== render functions ===== */
+function renderCategories(){
+  categoriesEl.innerHTML='';
+  state.categories.forEach(cat=>{
+    const d = document.createElement('details'); d.open=true;
+    const s = document.createElement('summary'); s.innerHTML = `<span>${cat.title}</span><span class="small">${cat.tasks.length} tareas</span>`;
+    d.appendChild(s);
+    const list = document.createElement('div'); list.className='task-list';
+    cat.tasks.forEach(task=>{ if (!state.completed.includes(task.id)) list.appendChild(taskElement(cat.id,task)); });
+    d.appendChild(list);
+    categoriesEl.appendChild(d);
+  });
+}
+
+function taskElement(catId,task){
+  const el = document.createElement('div'); el.className='task'; el.tabIndex=0; el.dataset.id=task.id; el.dataset.cat=catId;
+  const title = document.createElement('div'); title.className='title'; title.textContent = task.name;
+  const meta = document.createElement('div'); meta.className='small'; meta.textContent='';
+  el.appendChild(title); el.appendChild(meta);
+  el.addEventListener('click', ()=>completeTask(task.id,el));
+  el.addEventListener('keydown', (ev)=>{ if (ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); el.click(); } });
+  return el;
+}
+
+function renderCompleted(){
+  completedEl.innerHTML='';
+  state.completed.forEach(id=>{
+    const found = findTask(id);
+    if (!found) return;
+    const it = document.createElement('div'); it.className='completed-item'; it.tabIndex=0; it.dataset.id=id;
+    it.innerHTML = `<div>${found.name}</div><div class="small">Completada</div>`;
+    it.addEventListener('click', ()=>undoTask(id)); it.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'||ev.key===' ') { ev.preventDefault(); it.click(); } });
+    completedEl.appendChild(it);
+  });
+  updatePhraseAndCounters();
+}
+
+function findTask(id){
+  for(const cat of state.categories) for(const t of cat.tasks) if (t.id===id) return {name:t.name, cat:cat.id};
+  return null;
+}
+
+/* ===== actions ===== */
+function completeTask(id, el){
+  // animate
+  el.classList.add('anim');
+  playTone(); vibrate();
+  setTimeout(()=>{
+    if (!state.completed.includes(id)) state.completed.unshift(id);
+    saveState();
+    renderCategories(); renderCompleted();
+    // phrase
+    const phrase = STOIC_PHRASES[Math.floor(Math.random()*STOIC_PHRASES.length)];
+    phraseEl.textContent = '✨ '+phrase;
+    phraseEl.dataset.recent='1'; setTimeout(()=>{ phraseEl.dataset.recent='0'; updatePhraseAndCounters(); },4200);
+    // update streak (simple: if lastDate !== today then increment)
+    updateStreak();
+  },280);
+}
+
+function undoTask(id){
+  // remove from completed
+  state.completed = state.completed.filter(x=>x!==id); saveState(); renderCategories(); renderCompleted();
+  phraseEl.textContent = 'Tarea devuelta a pendientes.'; phraseEl.dataset.recent='1'; setTimeout(()=>{ phraseEl.dataset.recent='0'; updatePhraseAndCounters(); },1800);
+}
+
+function updatePhraseAndCounters(){
+  // summary if not recently set
+  if (phraseEl.dataset.recent==='1') return;
+  const total = state.categories.reduce((s,c)=>s+c.tasks.length,0);
+  phraseEl.textContent = `${state.completed.length} de ${total} tareas completadas`;
+  streakEl.textContent = 'Racha: '+(state.streak||0);
+}
+
+function updateStreak(){
+  const today = new Date().toISOString().slice(0,10);
+  if (state.lastDate !== today){
+    // if lastDate exists and is yesterday, continue streak, else reset? simple increment
+    // keep it simple: increment by 1 when first completion of today
+    const firstToday = !state._doneToday;
+    if (firstToday){ state.streak = (state.streak||0)+1; state._doneToday = true; }
+    state.lastDate = today; saveState(); renderCompleted();
+  }
+}
+
+/* ===== UI controls: reset/clear/edit/add/export ===== */
+document.getElementById('resetBtn').addEventListener('click',()=>{ if(!confirm('Reiniciar todo?')) return; state = defaultState(); saveState(); renderCategories(); renderCompleted(); });
+document.getElementById('clearBtn').addEventListener('click',()=>{ if(!confirm('Limpiar completadas?')) return; state.completed=[]; saveState(); renderCompleted(); });
+
+// add task
+const editCategorySelect = document.getElementById('editCategory');
+function populateEditCategories(){ editCategorySelect.innerHTML=''; state.categories.forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.title; editCategorySelect.appendChild(o); }); }
+populateEditCategories();
+
+document.getElementById('addTaskBtn').addEventListener('click',()=>{
+  const catId = editCategorySelect.value; const text = document.getElementById('newTaskText').value.trim(); if(!text) return alert('Escribe una tarea');
+  const cat = state.categories.find(c=>c.id===catId); if(!cat) return;
+  const id = 't'+Date.now(); cat.tasks.push({id:id,name:text}); saveState(); document.getElementById('newTaskText').value=''; renderCategories(); populateEditCategories();
+});
+
+// undo all
+document.getElementById('undoAll').addEventListener('click',()=>{ if(!confirm('¿Deshacer todas las completadas?')) return; state.completed=[]; saveState(); renderCategories(); renderCompleted(); });
+
+// download CSV of today's completed
+function downloadCSV(){
+  if(state.completed.length===0) return alert('No hay completadas');
+  const rows = [['Tarea','Fecha']];
+  const d = new Date().toLocaleString();
+  state.completed.forEach(id=>{ const f=findTask(id); rows.push([f?f.name:id,d]); });
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""') }"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='completadas.csv'; a.click(); URL.revokeObjectURL(url);
+}
+document.getElementById('downloadCSV').addEventListener('click',downloadCSV);
+
+// settings toggles
+document.getElementById('vibrateChk').addEventListener('change',(e)=>{ state.settings.vibrate = e.target.checked; saveState(); });
+document.getElementById('soundChk').addEventListener('change',(e)=>{ state.settings.sound = e.target.checked; saveState(); });
+document.getElementById('saveChk').addEventListener('change',(e)=>{ state.settings.save = e.target.checked; if(!e.target.checked) localStorage.removeItem(KEY_STATE); else saveState(); });
+whatsappInput.addEventListener('change',(e)=>{ state.settings.whatsapp = e.target.value.trim(); saveState(); });
+
+// export (send to WhatsApp) - uses user number
+document.getElementById('exportBtn').addEventListener('click', sendCompletedToWhatsApp);
+function sendCompletedToWhatsApp(){
+  if (state.completed.length===0) return alert('No tienes tareas completadas hoy.');
+  const phone = (state.settings.whatsapp||'+525649533789').replace(/[^+0-9]/g,'');
+  const lines = ['🌿 Tareas completadas hoy:',''];
+  state.completed.forEach(id=>{ const f=findTask(id); lines.push('- '+(f?f.name:id)); });
+  const text = encodeURIComponent(lines.join('\n'));
+  const url = 'https://wa.me/'+phone.replace(/^\+/,'')+'?text='+text;
+  window.open(url,'_blank');
+}
+
+// export button also available in aside - keep same function
+
+// undo all today flag on new day
+(function checkNewDay(){
+  const today = new Date().toISOString().slice(0,10);
+  if (state.lastDate !== today) { state._doneToday = false; saveState(); }
+})();
+
+/* ===== init ===== */
+renderCategories(); renderCompleted(); updatePhraseAndCounters();
+
+// populate edit categories initially
+populateEditCategories();
+
+// open settings modal (simple) toggles visibility of panel at right - not modal here
+document.getElementById('openSettings').addEventListener('click', ()=>{ window.scrollTo({top:0,behavior:'smooth'}); document.getElementById('whatsappNumber').focus(); });
+
+/* ===== PWA / service worker minimal registration ===== */
+if ('serviceWorker' in navigator){
+  try{
+    const sw = `self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>self.clients.claim());self.addEventListener('fetch',()=>{});`;
+    const blob = new Blob([sw],{type:'application/javascript'}); const swURL = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swURL).catch(()=>{});
+    // create a manifest blob
+    const manifest = {name:'Me amo, lo lograrás',short_name:'Me amo',start_url:'.',display:'standalone',background_color:'#02140f',theme_color:'#083b2b',icons:[{src:'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%230b6b3a"/><path d="M22 50c0-24 26-36 28-36s30 10 30 36c0 26-56 36-58 36s0-16 0-36z" fill="white"/></svg>',sizes:'192x192',type:'image/svg+xml'}]};
+    const mBlob = new Blob([JSON.stringify(manifest)],{type:'application/json'}); const mURL = URL.createObjectURL(mBlob);
+    const link = document.createElement('link'); link.rel='manifest'; link.href=mURL; document.head.appendChild(link);
+  }catch(e){}
+}
+
+/* ===== helper: defaultState used in reset ===== */
+function defaultState(){ return { categories: DEFAULT_CATEGORIES.map(c=>({id:c.id,title:c.title,tasks:c.tasks.map(t=>({id:t.id,name:t.name}))})), completed:[], streak:0, lastDate:null, settings:{vibrate:true,sound:true,save:true,whatsapp:'+525649533789'} }; }
+
+</script>
+</body>
+</html>
